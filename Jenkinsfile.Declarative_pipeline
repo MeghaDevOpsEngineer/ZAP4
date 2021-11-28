@@ -1,0 +1,32 @@
+pipeline {
+    agent any
+
+    // Put every environment variable needed by the script.
+    // Testing only. Global environment variables set.
+    environment {
+        ZAP_HOST = 'ec2-18-223-247-44.us-east-2.compute.amazonaws.com'
+        ZAP_PORT = '8090'
+        //ZAP_HOME
+        //SCRIPTS_PATH
+        //SESSION_NAME
+        //CONTEXT_NAME
+        //INCLUDE_URLS
+        //EXCLUDE_URLS
+        STARTING_POINT = 'https://endriu00.gitlab.io/me/'
+        //REPORT_NAME
+        //AUTH
+        //USERNAME
+        //PASSWORD
+        //USE_AJAX_SPIDER
+        //AJAX_TIMEOUT
+        //ADDITIONAL_URLS
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                sh 'python zap_test.py'
+            }
+        }
+    }
+}

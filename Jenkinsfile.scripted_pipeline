@@ -1,0 +1,45 @@
+// scripted version of the pipeline
+node {
+    // Define environment variables used by the script.
+    withEnv([
+             // ZAPROXY_HOME is the ZAP home directory.
+             'ZAPROXY_HOME=/var/jenkins_home/tools/com.cloudbees.jenkins.plugins.customtools.CustomTool/owasp-zap/ZAP_2.11.0',
+             // ZAP_HOST is the host where ZAP is running on.
+             'ZAP_HOST=localhost',
+             // ZAP_PORT is the port of the host where ZAP is running on.
+             'ZAP_PORT=5555',
+             // ZAP_HOME is the ZAP home directory.
+             'ZAP_HOME=/var/jenkins_home/tools/com.cloudbees.jenkins.plugins.customtools.CustomTool/owasp-zap/ZAP_2.11.0/',
+             // STARTING_POINT is the first url ZAP will start scanning from.
+             'STARTING_POINT=https://endriu00.gitlab.io/me/',
+             // INCLUDE_URLS are the urls to be included in the scan.
+             'INCLUDE_URLS=https://endriu00.gitlab.io/me/',
+             // SESSION_NAME is the name of the session.
+             'SESSION_NAME=test'
+             ]) 
+                // Pull the code from a remote repo.
+                {
+                stage('Preparation') { 
+                    git branch: 'main', url: 'https://gitlab.com/endriu00/zap_test.git'
+                }
+                // Execute the python script. Option --use-env tells 
+                // the script to use the environment variables set before.
+                stage('Execute script') {
+                    sh 'python3 zap_test.py --use-env'
+                }
+                // Archive the artifacts stored by zap in its
+                // report directory in the default htmlpublish 
+                // directory.
+                stage('Archive artifacts') {
+                    publishHTML([allowMissing: false, 
+                    alwaysLinkToLastBuild: false, 
+                    keepAll: false, 
+                    reportDir: 'reports/', 
+                    reportFiles: '*.html', 
+                    reportName: 'HTML Report', 
+                    reportTitles: ''])
+                }
+             }
+}
+
+
